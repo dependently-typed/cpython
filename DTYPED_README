@@ -1,0 +1,27 @@
+dependently-typed pipe operator in CPython project
+
+Project description:
+https://dtyped.netlify.app/wiki/projects/pipe-in-python/
+
+Adds a pipe operator "|>".
+
+Main modifications:
+1. Add pipe token to tokens file for lexer
+2. Add pipe syntax to grammar file for AST creation
+
+How to build:
+
+Configure with ./configure script.
+
+Build everything with make. Recommended to add the -j option to speed up making.
+
+Different targets exist which are used for generated portions of CPython (lexer, PEG parser, etc.).
+
+Use target regen-token to regenerate the token lexer if you change tokens.
+Use target regen-pegen to regenerate the PEG parser grammar into the parser.c file.
+
+Use the default target (empty/no target parameter) to build CPython.
+
+Run the created ./python executable.
+
+
