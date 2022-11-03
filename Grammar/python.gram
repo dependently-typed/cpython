@@ -777,8 +777,16 @@ power[expr_ty]:
 # Primary elements are things like "obj.something.something", "obj[something]", "obj(something)", "obj" ...
 
 await_primary[expr_ty] (memo):
-    | AWAIT a=primary { CHECK_VERSION(expr_ty, 5, "Await expressions are", _PyAST_Await(a, EXTRA)) }
-    | primary
+    | AWAIT a=pipe_primary { CHECK_VERSION(expr_ty, 5, "Await expressions are", _PyAST_Await(a, EXTRA)) }
+    | pipe_primary
+
+pipe_primary[expr_ty]:
+    | a=pipe_primary '|>' b=primary {
+        _PyAST_Call(b,
+            CHECK(asdl_expr_seq*, (asdl_expr_seq*)_PyPegen_singleton_seq(p, a)),
+            NULL,
+            EXTRA) }
+    | a=primary
 
 primary[expr_ty]:
     | a=primary '.' b=NAME { _PyAST_Attribute(a, b->v.Name.id, Load, EXTRA) }
@@ -789,11 +797,6 @@ primary[expr_ty]:
                  (b) ? ((expr_ty) b)->v.Call.keywords : NULL,
                  EXTRA) }
     | a=primary '[' b=slices ']' { _PyAST_Subscript(a, b, Load, EXTRA) }
-    | a=primary '|>' b=primary {
-        _PyAST_Call(b,
-            CHECK(asdl_expr_seq*, (asdl_expr_seq*)_PyPegen_singleton_seq(p, a)),
-            NULL,
-            EXTRA) }
     | atom
     
 
@@ -1027,7 +1030,7 @@ t_primary[expr_ty]:
                  (b) ? ((expr_ty) b)->v.Call.args : NULL,
                  (b) ? ((expr_ty) b)->v.Call.keywords : NULL,
                  EXTRA) }
-    | a=t_primary '|>' b=t_primary &t_lookahead { _PyAST_Call(b, CHECK(asdl_expr_seq*,(asdl_expr_seq*) _PyPegen_singleton_seq(p, a)), NULL, EXTRA) }
+    # | a=t_primary '|>' b=t_primary &t_lookahead { _PyAST_Call(b, CHECK(asdl_expr_seq*,(asdl_expr_seq*) _PyPegen_singleton_seq(p, a)), NULL, EXTRA) }
     | a=atom &t_lookahead { a }
     
 
