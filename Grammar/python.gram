@@ -789,7 +789,7 @@ primary[expr_ty]:
                  (b) ? ((expr_ty) b)->v.Call.keywords : NULL,
                  EXTRA) }
     | a=primary '[' b=slices ']' { _PyAST_Subscript(a, b, Load, EXTRA) }
-    | a=primary '|>' b=NAME {
+    | a=primary '|>' b=primary {
         _PyAST_Call(b,
             CHECK(asdl_expr_seq*, (asdl_expr_seq*)_PyPegen_singleton_seq(p, a)),
             NULL,
@@ -1027,7 +1027,7 @@ t_primary[expr_ty]:
                  (b) ? ((expr_ty) b)->v.Call.args : NULL,
                  (b) ? ((expr_ty) b)->v.Call.keywords : NULL,
                  EXTRA) }
-    | a=t_primary '|>' b=NAME &t_lookahead { _PyAST_Call(b, CHECK(asdl_expr_seq*,(asdl_expr_seq*) _PyPegen_singleton_seq(p, a)), NULL, EXTRA) }
+    | a=t_primary '|>' b=t_primary &t_lookahead { _PyAST_Call(b, CHECK(asdl_expr_seq*,(asdl_expr_seq*) _PyPegen_singleton_seq(p, a)), NULL, EXTRA) }
     | a=atom &t_lookahead { a }
     
 

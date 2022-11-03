@@ -13698,7 +13698,7 @@ await_primary_rule(Parser *p)
 //     | primary genexp
 //     | primary '(' arguments? ')'
 //     | primary '[' slices ']'
-//     | primary '|>' NAME
+//     | primary '|>' primary
 //     | atom
 static expr_ty primary_raw(Parser *);
 static expr_ty
@@ -13917,12 +13917,12 @@ primary_raw(Parser *p)
         D(fprintf(stderr, "%*c%s primary[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "primary '[' slices ']'"));
     }
-    { // primary '|>' NAME
+    { // primary '|>' primary
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> primary[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "primary '|>' NAME"));
+        D(fprintf(stderr, "%*c> primary[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "primary '|>' primary"));
         Token * _literal;
         expr_ty a;
         expr_ty b;
@@ -13931,10 +13931,10 @@ primary_raw(Parser *p)
             &&
             (_literal = _PyPegen_expect_token(p, 54))  // token='|>'
             &&
-            (b = _PyPegen_name_token(p))  // NAME
+            (b = primary_rule(p))  // primary
         )
         {
-            D(fprintf(stderr, "%*c+ primary[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "primary '|>' NAME"));
+            D(fprintf(stderr, "%*c+ primary[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "primary '|>' primary"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -13954,7 +13954,7 @@ primary_raw(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s primary[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "primary '|>' NAME"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "primary '|>' primary"));
     }
     { // atom
         if (p->error_indicator) {
@@ -17930,7 +17930,7 @@ single_subscript_attribute_target_rule(Parser *p)
 //     | t_primary '[' slices ']' &t_lookahead
 //     | t_primary genexp &t_lookahead
 //     | t_primary '(' arguments? ')' &t_lookahead
-//     | t_primary '|>' NAME &t_lookahead
+//     | t_primary '|>' t_primary &t_lookahead
 //     | atom &t_lookahead
 static expr_ty t_primary_raw(Parser *);
 static expr_ty
@@ -18157,12 +18157,12 @@ t_primary_raw(Parser *p)
         D(fprintf(stderr, "%*c%s t_primary[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "t_primary '(' arguments? ')' &t_lookahead"));
     }
-    { // t_primary '|>' NAME &t_lookahead
+    { // t_primary '|>' t_primary &t_lookahead
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> t_primary[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "t_primary '|>' NAME &t_lookahead"));
+        D(fprintf(stderr, "%*c> t_primary[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "t_primary '|>' t_primary &t_lookahead"));
         Token * _literal;
         expr_ty a;
         expr_ty b;
@@ -18171,12 +18171,12 @@ t_primary_raw(Parser *p)
             &&
             (_literal = _PyPegen_expect_token(p, 54))  // token='|>'
             &&
-            (b = _PyPegen_name_token(p))  // NAME
+            (b = t_primary_rule(p))  // t_primary
             &&
             _PyPegen_lookahead(1, t_lookahead_rule, p)
         )
         {
-            D(fprintf(stderr, "%*c+ t_primary[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "t_primary '|>' NAME &t_lookahead"));
+            D(fprintf(stderr, "%*c+ t_primary[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "t_primary '|>' t_primary &t_lookahead"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -18196,7 +18196,7 @@ t_primary_raw(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s t_primary[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "t_primary '|>' NAME &t_lookahead"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "t_primary '|>' t_primary &t_lookahead"));
     }
     { // atom &t_lookahead
         if (p->error_indicator) {
